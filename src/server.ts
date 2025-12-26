@@ -1,19 +1,28 @@
-import express, { type Request, type Response } from 'express';
+import express, { type Express, type RequestHandler } from "express";
 
-const app = express();
-const PORT = 3000;
+// Import Routes
+import movieRoutes from "./routes/movieRoutes.js";
 
-app.get('/', (req: Request, res: Response) => {
-    res.send("Hello, TypeScript with Express!")
-})
+const app: Express = express();
+const PORT = 5001;
+
+// API Routes
+app.use("/movies", movieRoutes);
+
+// Using RequestHandler provides better type inference for req, res, and next
+const homeHandler: RequestHandler = (_, res) => {
+  res.send("Hello, TypeScript with Express!");
+};
+
+app.get("/", homeHandler);
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`)
-})
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
 
 /**
  * ROUTE goals
- * 
+ *
  * AUTH - signin, signup, logout, get current user.
  * MOVIE - Getting all movies, adding a movie, deleting a movie, updating a movie.
  * USER - Getting all users, adding a user, deleting a user, updating a user.
