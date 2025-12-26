@@ -1,0 +1,90 @@
+{
+  "compilerOptions": {
+    /* ===== PROJECT STRUCTURE ===== */
+    // Where your TypeScript source files are located
+    "rootDir": "./src",
+    
+    // Where compiled JavaScript files will be output
+    "outDir": "./dist",
+
+    /* ===== MODULE SYSTEM ===== */
+    // "NodeNext" - Modern Node.js module resolution (supports both ESM and CommonJS)
+    // This is the recommended setting for Node.js projects
+    "module": "NodeNext",
+    
+    // Module resolution strategy - how TypeScript finds imported modules
+    "moduleResolution": "NodeNext",
+    
+    // "ES2022" - Target modern JavaScript (Node.js 16+ supports this)
+    // Using ES2022 instead of ESNext for stability
+    "target": "ES2022",
+    
+    // Specify library files to include (not needed for Node.js, it uses built-in types)
+    // "lib": ["ES2022"],
+
+    /* ===== TYPE CHECKING ===== */
+    // Enable ALL strict type-checking options (HIGHLY RECOMMENDED for learning!)
+    "strict": true,
+    
+    // Additional strict checks beyond "strict: true"
+    "noUncheckedIndexedAccess": true,      // Arrays/objects might be undefined
+    "noImplicitReturns": true,              // All code paths must return a value
+    "noFallthroughCasesInSwitch": true,     // Switch cases must have break/return
+    "noUnusedLocals": true,                 // Catch unused variables
+    "noUnusedParameters": true,             // Catch unused function parameters
+    "exactOptionalPropertyTypes": true,     // Distinguish undefined from missing properties
+
+    /* ===== MODULE BEHAVIOR ===== */
+    // Allow default imports from modules with no default export (better CommonJS compatibility)
+    "esModuleInterop": true,
+    
+    // Ensure imports are written exactly as they should be used
+    "verbatimModuleSyntax": true,
+    
+    // Treat each file as a separate module (required for some build tools)
+    "isolatedModules": true,
+    
+    // Detect modules even without import/export (prevents global scope issues)
+    "moduleDetection": "force",
+
+    /* ===== EMIT OPTIONS ===== */
+    // Generate .d.ts declaration files (useful for building libraries)
+    "declaration": true,
+    
+    // Generate source maps for debugging (maps compiled JS back to TS)
+    "sourceMap": true,
+    
+    // Generate source maps for declaration files
+    "declarationMap": true,
+    
+    // Remove comments from compiled output (keeps dist folder clean)
+    "removeComments": true,
+
+    /* ===== INTEROP & COMPATIBILITY ===== */
+    // Ensure file names are case-sensitive (prevents issues on different OS)
+    "forceConsistentCasingInFileNames": true,
+    
+    // Skip type checking of declaration files (speeds up compilation)
+    "skipLibCheck": true,
+    
+    // Allow importing JSON files as modules
+    "resolveJsonModule": true,
+
+    /* ===== TYPE DEFINITIONS ===== */
+    // Include Node.js type definitions (@types/node package)
+    "types": ["node"]
+  },
+  
+  // Files/folders to include in compilation
+  "include": [
+    "src/**/*"
+  ],
+  
+  // Files/folders to exclude from compilation
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}
