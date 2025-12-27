@@ -4,6 +4,7 @@ import { connectDB, disConnectDB } from "./config/db.js";
 
 // Import Routes
 import movieRoutes from "./routes/movieRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 config();
 connectDB();
@@ -11,8 +12,13 @@ connectDB();
 const app: Express = express();
 const PORT = process.env.PORT || 5001;
 
+// Body parsing middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // API Routes
 app.use("/movies", movieRoutes);
+app.use("/auth", authRoutes);
 
 // Using RequestHandler provides better type inference for req, res, and next
 const homeHandler: RequestHandler = (_, res) => {
