@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "nodemon --exec tsx src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "seed:movies": "tsx prisma/seed.ts"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
