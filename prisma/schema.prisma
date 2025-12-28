@@ -53,8 +53,11 @@ model WatchlistItem {
   updatedAt DateTime        @default(now())
 
   // Relations
+  // onDelete: Cascade ensures related rows are removed automatically
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
 }
 
 enum WatchlistStatus {
@@ -63,3 +66,50 @@ enum WatchlistStatus {
   COMPLETED
   DROPPED
 }
+
+/**
+ * ────────────────────────────────────────────────────────────────
+ * PRISMA SCHEMA – IMPORTANT WORKFLOW NOTES (READ BEFORE CHANGING)
+ * ────────────────────────────────────────────────────────────────
+ * This file defines the *desired state* of the database schema:
+ * - Models (tables)
+ * - Fields (columns)
+ * - Relations
+ * - Enums
+ * - Constraints (unique, defaults, etc.)
+ * ────────────────────────────────────────────────────────────────
+ * HOW CHANGES IN THIS FILE AFFECT THE PROJECT
+ * ────────────────────────────────────────────────────────────────
+ * 1) `npx prisma migrate dev --name <migration_name>`
+ * • Compares this schema with the current database
+ * • Generates a SQL migration inside `prisma/migrations/`
+ * • Applies that SQL to the database
+ * • Records the migration in `_prisma_migrations`
+ * Use this when:
+ * - Adding/removing fields
+ * - Changing relations
+ * - Adding constraints (unique, cascade, etc.)
+ * - You want schema changes to be versioned and reproducible
+ * IMPORTANT:
+ * - This command MUTATES the database
+ * - The generated SQL file is the source of truth
+ * ────────────────────────────────────────────────────────────────
+ * 2) `npx prisma generate`
+ * • Generates the Prisma Client based on this schema
+ * • Writes typed query code into `node_modules/@prisma/client`
+ * • Does NOT touch the database
+ * Use this when:
+ * - Models or fields change
+ * - Types are out of sync
+ * - Prisma Client autocomplete feels incorrect
+ * ────────────────────────────────────────────────────────────────
+ * MENTAL MODEL (VERY IMPORTANT):
+ * - schema.prisma  → "What the database SHOULD look like"
+ * - migrations     → "How the database GOT there"
+ * - Prisma Client  → "How application code talks to the database"
+ * Database changes require MIGRATIONS.
+ * TypeScript safety requires GENERATE.
+ * Do NOT edit the database manually and expect Prisma to infer it.
+ * Always change the schema, then migrate.
+ * ────────────────────────────────────────────────────────────────
+ */
