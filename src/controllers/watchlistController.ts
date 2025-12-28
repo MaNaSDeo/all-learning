@@ -1,6 +1,8 @@
 import { type RequestHandler } from "express";
 import { prisma } from "../config/db.js";
 import { StatusCodes } from "http-status-codes";
+import { Prisma } from "@prisma/client";
+import { error } from "node:console";
 
 type AddToWatchlistBody = {
   movieId: string;
@@ -8,6 +10,20 @@ type AddToWatchlistBody = {
   status?: "PLANNED" | "WATCHING" | "COMPLETED";
   rating?: number;
   notes?: string;
+};
+
+type UpdateWatchlistBody = {
+  status?: "PLANNED" | "WATCHING" | "COMPLETED";
+  rating?: number;
+  notes?: string;
+};
+
+type UpdateWatchlistParams = {
+  id: string;
+};
+
+type RemoveFromWatchlistParams = {
+  id: string;
 };
 
 const addToWatchList: RequestHandler<
@@ -64,4 +80,115 @@ const addToWatchList: RequestHandler<
   });
 };
 
-export { addToWatchList };
+/**
+ * Update watchlist item
+ * Updates status, rating, or notes
+ * Ensures only owner can update
+ * Requires protect middleware
+ */
+const updateWatchlistItem: RequestHandler<
+  UpdateWatchlistParams,
+  any,
+  UpdateWatchlistBody
+> = async (req, res) => {
+  if (!req.user) {
+    return res.status(StatusCodes.UNAUTHORIZED).json({
+      error: "Not authenticated",
+    });
+  }
+
+  const { status, rating, notes } = req.body;
+
+  // Find watchlist item and verify ownership
+  const watchlist = await prisma.watchlistItem.findUnique({
+    where: {
+      id: req.params.id,
+    },
+  });
+
+  if (!watchlist) {
+    return res.status(StatusCodes.UNAUTHORIZED).json({
+      error: "Watchlist item not found",
+    });
+  }
+
+  // Ensure only owner can update
+  if (watchlist.userId !== req.user.id) {
+    return res.status(StatusCodes.FORBIDDEN).json({
+      error: "Not allowed to update this watchlist item",
+    });
+  }
+
+  // Build update data
+  const updateData: Prisma.WatchlistItemUpdateInput = {};
+
+  if (status !== undefined) updateData.status = status;
+  if (rating !== undefined) updateData.rating = rating;
+  if (notes !== undefined) updateData.notes = notes;
+
+  // Update watchlist item
+  const updatedItem = await prisma.watchlistItem.update({
+    where: {
+      id: req.params.id,
+    },
+    data: updateData,
+  });
+
+  return res.status(StatusCodes.OK).json({
+    status: "success",
+    data: {
+      watchlist: updatedItem,
+    },
+  });
+};
+
+/**
+ * Remove movie from watchlist
+ * Deletes watchlist item
+ * Ensures only owner can delete
+ * Requires protect middleware
+ */
+const removeFromWatchlist: RequestHandler<
+  RemoveFromWatchlistParams,
+  any,
+  any
+> = async (req, res) => {
+  if (!req.user) {
+    return res.status(StatusCodes.UNAUTHORIZED).json({
+      error: "Not authenticated",
+    });
+  }
+
+  // Find watchlist item and verify ownership
+  const watchlistItem = await prisma.watchlistItem.findUnique({
+    where: {
+      id: req.params.id,
+    },
+  });
+
+  if (!watchlistItem) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      error: "Watchlist item not found",
+    });
+  }
+
+  // Ensure only owner can delete
+  if (req.user.id !== watchlistItem.userId) {
+    return res.status(StatusCodes.FORBIDDEN).json({
+      error: "Not allowed to update this watchlist item",
+    });
+  }
+
+  await prisma.watchlistItem.delete({
+    where: {
+      id: req.params.id,
+    },
+  });
+
+  return res.status(StatusCodes.OK).json({
+    status: "success",
+    message: "Movie removed from watchlist",
+  });
+};
+
+export { addToWatchList, updateWatchlistItem, removeFromWatchlist };
